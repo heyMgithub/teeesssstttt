@@ -56,13 +56,13 @@ class _PlayerPageState extends State<PlayerPage> with SingleTickerProviderStateM
       });
     });
 
-    _audioPlayer.onAudioPositionChanged.listen((p) {
+    _audioPlayer.onPositionChanged.listen((p) {
       setState(() {
         position = p;
       });
     });
 
-    _audioPlayer.onPlayerCompletion.listen((event) {
+    _audioPlayer.onPlayerComplete.listen((event) {
       if (isRepeating) {
         playSong(widget.songs[currentIndex]);
       } else {
@@ -78,18 +78,11 @@ class _PlayerPageState extends State<PlayerPage> with SingleTickerProviderStateM
 
   void playSong(Song song) async {
     await _audioPlayer.stop();
-    int result = await _audioPlayer.play(song.songLink!, isLocal: false);
-    if (result == 1) {
-      setState(() {
-        isPlaying = true;
-        _animationController.repeat(reverse: true);
-      });
-    } else {
-      setState(() {
-        isPlaying = false;
-        _animationController.stop();
-      });
-    }
+    await _audioPlayer.play(UrlSource(song.songLink!));
+    setState(() {
+      isPlaying = true;
+      _animationController.repeat(reverse: true);
+    });
   }
 
   void pauseSong() async {
@@ -101,18 +94,11 @@ class _PlayerPageState extends State<PlayerPage> with SingleTickerProviderStateM
   }
 
   void resumeSong() async {
-    int result = await _audioPlayer.resume();
-    if (result == 1) {
-      setState(() {
-        isPlaying = true;
-        _animationController.repeat(reverse: true);
-      });
-    } else {
-      setState(() {
-        isPlaying = false;
-        _animationController.stop();
-      });
-    }
+    await _audioPlayer.resume();
+    setState(() {
+      isPlaying = true;
+      _animationController.repeat(reverse: true);
+    });
   }
 
   void playNextSong() {
@@ -126,7 +112,9 @@ class _PlayerPageState extends State<PlayerPage> with SingleTickerProviderStateM
         _animationController.stop();
       });
     }
-    isFavorite = widget.favoriteSongs.contains(widget.songs[currentIndex]);
+    setState(() {
+      isFavorite = widget.favoriteSongs.contains(widget.songs[currentIndex]);
+    });
   }
 
   void playPreviousSong() {
@@ -140,7 +128,9 @@ class _PlayerPageState extends State<PlayerPage> with SingleTickerProviderStateM
         _animationController.stop();
       });
     }
-    isFavorite = widget.favoriteSongs.contains(widget.songs[currentIndex]);
+    setState(() {
+      isFavorite = widget.favoriteSongs.contains(widget.songs[currentIndex]);
+    });
   }
 
   void toggleFavorite() {
